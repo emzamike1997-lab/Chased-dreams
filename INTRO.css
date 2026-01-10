@@ -1970,8 +1970,8 @@ p {
 
     /* Buy Section Mobile Optimization */
     .header {
-        padding: 40px var(--spacing-sm);
-        margin-bottom: var(--spacing-md);
+        padding: 30px var(--spacing-sm) 20px;
+        margin-bottom: var(--spacing-lg);
         text-align: center;
         width: 100%;
         display: flex;
@@ -1980,19 +1980,19 @@ p {
     }
 
     .header-title {
-        font-size: 2.2rem;
+        font-size: 2rem;
         font-weight: 700;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         line-height: 1.2;
         width: 100%;
         max-width: 90vw;
     }
 
     .header-subtitle {
-        font-size: 1.1rem;
+        font-size: 1rem;
         font-style: italic;
         opacity: 0.8;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
     }
 
     .product-categories {
@@ -2031,14 +2031,63 @@ p {
     }
 
     .footer-content {
-        grid-template-columns: repeat(2, 1fr);
-        gap: var(--spacing-lg);
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: var(--spacing-sm);
         text-align: left;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .footer-content::-webkit-scrollbar {
+        display: none;
+    }
+
+    .footer-section {
+        flex: 0 0 auto;
+        min-width: 140px;
+        max-width: 180px;
+    }
+
+    .footer-section h4 {
+        font-size: 0.85rem;
+        margin-bottom: 8px;
+        white-space: nowrap;
+    }
+
+    .footer-section p {
+        font-size: 0.7rem;
+        line-height: 1.3;
+        margin-bottom: 8px;
+    }
+
+    .footer-links {
+        font-size: 0.7rem;
+    }
+
+    .footer-links li {
+        margin-bottom: 4px;
+    }
+
+    .footer-section .btn {
+        font-size: 0.7rem;
+        padding: 6px 12px;
     }
 
     .site-footer {
         margin-left: 0 !important;
-        padding: var(--spacing-lg) var(--spacing-md);
+        padding: var(--spacing-md) var(--spacing-sm);
+        position: relative;
+        margin-top: 40px;
+    }
+
+    .footer-bottom {
+        font-size: 0.65rem;
+        padding-top: 10px;
+        margin-top: 10px;
     }
 
     .pop-button {
