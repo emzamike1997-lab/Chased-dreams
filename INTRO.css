@@ -1998,11 +1998,11 @@ p {
     .product-categories {
         display: flex;
         justify-content: center;
-        gap: 20px;
+        gap: 12px;
         flex-wrap: nowrap;
-        padding-bottom: 15px;
+        padding: 0 var(--spacing-sm) 15px;
         margin-bottom: var(--spacing-xl);
-        width: calc(100% - 40px);
+        width: 100%;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
@@ -2017,11 +2017,12 @@ p {
         padding: 0 0 5px 0;
         background: transparent;
         border: none;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         font-weight: 600;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
         color: var(--color-text-body);
         white-space: nowrap;
+        flex-shrink: 0;
     }
 
     .product-grid {
