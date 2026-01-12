@@ -60,8 +60,149 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Set home section as default landing page
     navigateToSection('home');
+
+    // Wire up Hero buttons
+    const shopNowBtn = document.querySelector('.hero-actions .btn-primary');
+    if (shopNowBtn) {
+        shopNowBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            navigateToSection('buy');
+        });
+    }
+
+    const startSellingBtn = document.querySelector('.hero-actions .btn-secondary');
+    if (startSellingBtn) {
+        startSellingBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            navigateToSection('sell');
+        });
+    }
+
     console.log('CHASED Website Initialization Complete');
 });
+
+/**
+ * Global Navigation Controller
+ * Handles switching between different content sections
+ */
+function navigateToSection(sectionId) {
+    console.log(`Navigating to section: ${sectionId}`);
+
+    const sections = document.querySelectorAll('.content-section');
+    sections.forEach(section => {
+        section.style.display = 'none';
+        section.classList.remove('active');
+    });
+
+    const targetSection = document.getElementById(`${sectionId}-section`);
+    if (targetSection) {
+        targetSection.style.display = 'block';
+        setTimeout(() => targetSection.classList.add('active'), 10);
+
+        // Scroll to top of the content area
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+        console.warn(`Section not found: ${sectionId}`);
+    }
+
+    // Update active states in all navigation elements
+    updateNavigationActiveState(sectionId);
+
+    // Auto-close sidebar on mobile after navigation
+    if (window.innerWidth <= 768) {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar && !sidebar.classList.contains('hidden')) {
+            sidebar.classList.add('hidden');
+            const mainContent = document.getElementById('mainContent');
+            if (mainContent) mainContent.classList.remove('expanded');
+        }
+    }
+}
+
+/**
+ * Updates active class on all nav links matching the current section
+ */
+function updateNavigationActiveState(sectionId) {
+    const navLinks = document.querySelectorAll('[data-section]');
+    navLinks.forEach(link => {
+        if (link.getAttribute('data-section') === sectionId) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
+        }
+    });
+}
+
+/**
+ * Initializes global navigation listeners
+ */
+function initializeNavigation() {
+    const navElements = document.querySelectorAll('[data-section]');
+    navElements.forEach(element => {
+        element.addEventListener('click', (e) => {
+            e.preventDefault();
+            const section = element.getAttribute('data-section');
+            if (section) {
+                navigateToSection(section);
+            }
+        });
+    });
+
+    // Special handlers for Help/Contact if they lead to modals or other behavior
+    const helpLinks = [document.getElementById('help-link'), document.getElementById('mobile-help-link')];
+    helpLinks.forEach(link => {
+        if (link) {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                alert('Help Center Coming Soon!');
+            });
+        }
+    });
+
+    const contactLinks = [document.getElementById('contact-link'), document.getElementById('mobile-contact-link')];
+    contactLinks.forEach(link => {
+        if (link) {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                alert('Contact Form Coming Soon!');
+            });
+        }
+    });
+}
+
+/**
+ * Initializes Header Search Toggling
+ */
+function initializeHeaderSearch() {
+    const searchToggle = document.getElementById('search-toggle');
+    const searchInput = document.getElementById('search-input');
+
+    if (searchToggle && searchInput) {
+        searchToggle.addEventListener('click', () => {
+            searchInput.classList.toggle('active');
+            if (searchInput.classList.contains('active')) {
+                searchInput.focus();
+            }
+        });
+    }
+
+    const mobileSearchToggle = document.getElementById('mobile-search-toggle');
+    const mobileSearchContainer = document.getElementById('mobile-header-search');
+    const mobileSearchClose = document.getElementById('mobile-search-close');
+
+    if (mobileSearchToggle && mobileSearchContainer) {
+        mobileSearchToggle.addEventListener('click', () => {
+            mobileSearchContainer.classList.add('active');
+        });
+    }
+
+    if (mobileSearchClose && mobileSearchContainer) {
+        mobileSearchClose.addEventListener('click', () => {
+            mobileSearchContainer.classList.remove('active');
+        });
+    }
+}
+
 
 function initializeMobileCart() {
     const mobileCartBtn = document.getElementById('cart-link-mobile');
@@ -916,6 +1057,80 @@ function initializeParallax() {
         }
     });
 }
+
+/**
+ * Initializes Product Details/Preview
+ */
+function initializeProductDetails() {
+    const detailButtons = document.querySelectorAll('.btn-secondary');
+    detailButtons.forEach(button => {
+        // Only target buttons that are in product cards and NOT the cart modal
+        if (button.closest('.product-card') && !button.closest('.modal')) {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                const card = button.closest('.product-card');
+                const name = card.querySelector('.product-name').textContent;
+                alert(`Details for ${name} coming soon! We are working on our immersive product preview.`);
+            });
+        }
+    });
+}
+
+/**
+ * Initializes Sell Section Interactions
+ */
+function initializeSellMenu() {
+    const sellButtons = document.querySelectorAll('.sell-card .btn-primary');
+    sellButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            const service = button.closest('.sell-card').querySelector('h3').textContent;
+            alert(`Our ${service} portal is opening soon. Stay tuned!`);
+        });
+    });
+}
+
+/**
+ * Initializes User Reviews/Interactions
+ */
+function initializeProfileForms() {
+    // This is already defined in the Auth section above
+    // Keeping it here as a placeholder for additional profile-related interactions
+}
+
+/**
+ * Initializes Header Sticky Behavior and Interactions
+ */
+function initializeHeaderInteractions() {
+    const siteHeader = document.querySelector('.site-header');
+
+    // Sticky Header
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            siteHeader.classList.add('scrolled');
+        } else {
+            siteHeader.classList.remove('scrolled');
+        }
+    });
+
+    // Mobile specific header elements
+    const homeBtn = document.getElementById('home-btn-mobile');
+    if (homeBtn) {
+        homeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            navigateToSection('home');
+        });
+    }
+}
+
+/**
+ * Initializes Image Viewer (Immersive Mode)
+ */
+function initializeImageViewer() {
+    console.log('Image viewer initialization (staged)');
+    // Placeholder for future zoom/pan features on product images
+}
+
 
 // Ripple effect for buttons
 function initializeRippleEffects() {
