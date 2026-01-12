@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - CHASED</title>
+    <link rel="stylesheet" href="INTRO.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="brand">
+            <div class="brand-icon">C</div>
+            <span class="brand-name">CHASED</span>
+        </div>
+    </header>
+
+    <div class="welcome-container">
+        <div class="welcome-content">
+            <div class="welcome-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h1 class="welcome-title">Welcome to Chased!</h1>
+            <p class="welcome-email" id="user-email">Loading...</p>
+            <p class="welcome-message">We're glad you're here. Start exploring our exclusive collection of premium
+                footwear and accessories.</p>
+
+            <div class="welcome-actions">
+                <a href="index.html" class="btn btn-primary">Start Shopping</a>
+                <button id="logout-btn" class="btn btn-secondary">Logout</button>
+            </div>
+
+            <div class="welcome-features">
+                <div class="feature-item">
+                    <i class="fas fa-shopping-bag"></i>
+                    <h3>Shop</h3>
+                    <p>Browse our collection</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-user"></i>
+                    <h3>Profile</h3>
+                    <p>Manage your account</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-heart"></i>
+                    <h3>Wishlist</h3>
+                    <p>Save your favorites</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Supabase
+        const supabaseUrl = 'https://keznpnwibyphyvjbslox.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtlem5wbndpYnlwaHl2amJzbG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxODE0MzIsImV4cCI6MjA4Mzc1NzQyMn0.efisBO6y3ySFV9InD2boDIIWpBnFVpKfsMBGH7K9OTM';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Check authentication on page load
+        async function checkAuth() {
+            const { data: { session }, error } = await supabase.auth.getSession();
+
+            if (!session) {
+                // No session, redirect to login
+                window.location.href = 'index.html#profile';
+                return;
+            }
+
+            // Display user email
+            const emailElement = document.getElementById('user-email');
+            const userName = session.user.user_metadata.full_name || session.user.email;
+            emailElement.textContent = userName;
+        }
+
+        // Logout functionality
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                alert('Error signing out: ' + error.message);
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Run on page load
+        checkAuth();
+    </script>
+</body>
+
+</html>

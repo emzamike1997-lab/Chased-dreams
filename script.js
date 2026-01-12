@@ -296,12 +296,12 @@ function removeFromCart(index) {
 }
 
 // ===================================
-// USER AUTHENTICATION
+// USER AUTHENTICATION (Enhanced)
 // ===================================
-
 
 // Initialize Supabase Client (Lazy Load)
 let supabase;
+let currentUserEmail = ''; // Store email for OTP verification
 
 function initializeAuth() {
     console.log('Initializing Auth...');
@@ -309,7 +309,7 @@ function initializeAuth() {
     // Check if Supabase SDK is loaded
     if (!window.supabase) {
         console.error('CRITICAL ERROR: Supabase SDK not loaded. Check your internet connection or ad blocker.');
-        alert('Authentication system failed to load. Please refresh the page.');
+        showAuthMessage('Authentication system failed to load. Please refresh the page.', 'error');
         return;
     }
 
@@ -326,7 +326,12 @@ function initializeAuth() {
         // Listen for auth state changes
         supabase.auth.onAuthStateChange((event, session) => {
             console.log('Auth State Change:', event, session);
-            updateAuthUI(session);
+            if (event === 'SIGNED_IN') {
+                // Redirect to welcome page on successful login
+                window.location.href = 'welcome.html';
+            } else {
+                updateAuthUI(session);
+            }
         });
 
         // Check initial session
@@ -334,6 +339,7 @@ function initializeAuth() {
 
     } catch (err) {
         console.error('Auth Initialization Failed:', err);
+        showAuthMessage('Authentication initialization failed.', 'error');
     }
 }
 
@@ -352,44 +358,11 @@ function updateAuthUI(session) {
     const loginContainer = document.querySelector('.profile-container');
 
     if (session) {
-        // User is logged in
-        renderLoggedInView(session.user, loginContainer);
+        // User is logged in - redirect to welcome page
+        window.location.href = 'welcome.html';
     } else {
         // User is logged out
         renderLoggedOutView(loginContainer);
-    }
-}
-
-function renderLoggedInView(user, container) {
-    if (!container) return;
-    const userEmail = user.email;
-    const userName = user.user_metadata.full_name || 'User';
-
-    container.innerHTML = `
-        <div class="header">
-            <h1 class="header-title">Welcome Back</h1>
-            <p class="header-subtitle">${userName}</p>
-        </div>
-        
-        <div class="user-dashboard" style="text-align: center; margin-top: 2rem;">
-            <div class="user-avatar" style="width: 80px; height: 80px; background: #333; color: #fff; border-radius: 50%; font-size: 2rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
-                ${userName.charAt(0).toUpperCase()}
-            </div>
-            <p style="margin-bottom: 2rem; color: #666;">${userEmail}</p>
-            
-            <div class="dashboard-actions">
-                <button id="logout-btn" class="btn btn-secondary">Sign Out</button>
-            </div>
-        </div>
-    `;
-
-    // Attach logout listener
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            const { error } = await supabase.auth.signOut();
-            if (error) alert('Error signing out: ' + error.message);
-        });
     }
 }
 
@@ -406,6 +379,15 @@ function renderLoggedOutView(container) {
 
     // Restore original login forms
     container.innerHTML = `
+        <!-- Loading Spinner -->
+        <div class="auth-loading" id="auth-loading" style="display: none;">
+            <div class="spinner"></div>
+            <p id="loading-text">Processing...</p>
+        </div>
+
+        <!-- Error/Success Messages -->
+        <div class="auth-message" id="auth-message" style="display: none;"></div>
+
         <div class="header">
             <h1 class="header-title">Your Account</h1>
             <p class="header-subtitle">Login or create a new account to get started</p>
@@ -422,11 +404,13 @@ function renderLoggedOutView(container) {
                 <div class="form-group">
                     <label for="login-email">Email Address</label>
                     <input type="email" id="login-email" class="form-input" placeholder="your@email.com" required>
+                    <span class="field-error" id="login-email-error"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="login-password">Password</label>
                     <input type="password" id="login-password" class="form-input" placeholder="Enter your password" required>
+                    <span class="field-error" id="login-password-error"></span>
                 </div>
 
                 <div class="form-options">
@@ -452,16 +436,19 @@ function renderLoggedOutView(container) {
                 <div class="form-group">
                     <label for="signup-email">Email Address</label>
                     <input type="email" id="signup-email" class="form-input" placeholder="your@email.com" required>
+                    <span class="field-error" id="signup-email-error"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="signup-password">Password</label>
-                    <input type="password" id="signup-password" class="form-input" placeholder="Create a strong password" required>
+                    <input type="password" id="signup-password" class="form-input" placeholder="Create a strong password (min 6 characters)" required>
+                    <span class="field-error" id="signup-password-error"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="signup-confirm">Confirm Password</label>
                     <input type="password" id="signup-confirm" class="form-input" placeholder="Re-enter your password" required>
+                    <span class="field-error" id="signup-confirm-error"></span>
                 </div>
 
                 <label class="checkbox-label">
@@ -472,22 +459,92 @@ function renderLoggedOutView(container) {
                 <button type="submit" class="btn btn-primary btn-full">Create Account</button>
             </form>
         </div>
+
+        <!-- OTP Verification Form (Hidden by default) -->
+        <div class="auth-form-container" id="otp-form-container" style="display: none;">
+            <div class="otp-header">
+                <h2>Verify Your Email</h2>
+                <p>We've sent a 6-digit code to <strong id="otp-email-display"></strong></p>
+            </div>
+            <form class="profile-form" id="otp-verification-form">
+                <div class="otp-input-group">
+                    <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Verify Code</button>
+                <button type="button" class="btn btn-secondary btn-full" id="resend-otp-btn">Resend Code</button>
+                <button type="button" class="btn-link" id="back-to-login-btn">Back to Login</button>
+            </form>
+        </div>
     `;
 
     // Re-initialize listeners since we replaced DOM
     initializeProfileForms();
 }
 
+// Helper function to show loading state
+function showLoading(message = 'Processing...') {
+    const loadingEl = document.getElementById('auth-loading');
+    const loadingText = document.getElementById('loading-text');
+    if (loadingEl && loadingText) {
+        loadingText.textContent = message;
+        loadingEl.style.display = 'block';
+    }
+}
+
+function hideLoading() {
+    const loadingEl = document.getElementById('auth-loading');
+    if (loadingEl) {
+        loadingEl.style.display = 'none';
+    }
+}
+
+// Helper function to show auth messages
+function showAuthMessage(message, type = 'error') {
+    const messageEl = document.getElementById('auth-message');
+    if (messageEl) {
+        messageEl.textContent = message;
+        messageEl.className = `auth-message ${type}`;
+        messageEl.style.display = 'block';
+
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            messageEl.style.display = 'none';
+        }, 5000);
+    }
+}
+
+// Email validation
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+// Show OTP verification form
+function showOTPVerification(email) {
+    currentUserEmail = email;
+    document.getElementById('login-form-container').style.display = 'none';
+    document.getElementById('signup-form-container').style.display = 'none';
+    document.getElementById('otp-form-container').style.display = 'block';
+    document.getElementById('otp-email-display').textContent = email;
+
+    // Focus first OTP input
+    const firstInput = document.querySelector('.otp-input');
+    if (firstInput) firstInput.focus();
+}
+
 function initializeProfileForms() {
     console.log('Initializing Profile Forms Logic...');
-
-    // Remove old listeners to prevent duplicates (not easily possible with anon functions, 
-    // but the check above prevents re-rendering which is the main cause)
 
     const loginTab = document.getElementById('login-tab');
     const signupTab = document.getElementById('signup-tab');
     const loginForm = document.getElementById('login-form-container');
     const signupForm = document.getElementById('signup-form-container');
+    const otpForm = document.getElementById('otp-form-container');
 
     if (loginTab && signupTab && loginForm && signupForm) {
         // Tab switching
@@ -496,6 +553,7 @@ function initializeProfileForms() {
             signupTab.classList.remove('active');
             loginForm.style.display = 'block';
             signupForm.style.display = 'none';
+            if (otpForm) otpForm.style.display = 'none';
         };
 
         signupTab.onclick = () => {
@@ -503,6 +561,7 @@ function initializeProfileForms() {
             loginTab.classList.remove('active');
             signupForm.style.display = 'block';
             loginForm.style.display = 'none';
+            if (otpForm) otpForm.style.display = 'none';
         };
     }
 
@@ -510,20 +569,26 @@ function initializeProfileForms() {
     const loginFormElement = document.getElementById('profile-login-form');
     if (loginFormElement) {
         console.log('Attaching Login Listener');
-        // Use onclick on the button instead of submit on form to be safer? 
-        // No, form submit is better for enter key support. 
-        // We set onsubmit property to avoid multiple listeners if this function is called multiple times
         loginFormElement.onsubmit = async (e) => {
             e.preventDefault();
             console.log('Login Form Submitted');
-            const email = document.getElementById('login-email').value;
+
+            const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
-            const btn = loginFormElement.querySelector('button');
-            const originalText = btn.textContent;
+
+            // Validation
+            if (!isValidEmail(email)) {
+                showAuthMessage('Please enter a valid email address.', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showAuthMessage('Password must be at least 6 characters.', 'error');
+                return;
+            }
 
             try {
-                btn.textContent = 'Logging in...';
-                btn.disabled = true;
+                showLoading('Logging in...');
 
                 if (!supabase) throw new Error("Supabase client not initialized");
 
@@ -532,18 +597,28 @@ function initializeProfileForms() {
                     password
                 });
 
-                if (error) throw error;
-                // Success handled by onAuthStateChange
+                if (error) {
+                    // Enhanced error handling
+                    if (error.message.includes('Invalid login credentials')) {
+                        showAuthMessage('Account not found or incorrect password. Please check your credentials or create an account.', 'error');
+                    } else if (error.message.includes('Email not confirmed')) {
+                        showAuthMessage('Please verify your email first. Check your inbox for the verification code.', 'error');
+                        showOTPVerification(email);
+                    } else {
+                        showAuthMessage('Login failed: ' + error.message, 'error');
+                    }
+                    throw error;
+                }
+
+                // Success - redirect handled by onAuthStateChange
+                showAuthMessage('Login successful! Redirecting...', 'success');
+
             } catch (error) {
                 console.error('Login Error:', error);
-                alert('Login failed: ' + error.message);
             } finally {
-                btn.textContent = originalText;
-                btn.disabled = false;
+                hideLoading();
             }
         };
-    } else {
-        console.error('Login Form Element NOT FOUND');
     }
 
     // Handle signup form submission
@@ -553,21 +628,30 @@ function initializeProfileForms() {
         signupFormElement.onsubmit = async (e) => {
             e.preventDefault();
             console.log('Signup Form Submitted');
-            const name = document.getElementById('signup-name').value;
-            const email = document.getElementById('signup-email').value;
+
+            const name = document.getElementById('signup-name').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
             const password = document.getElementById('signup-password').value;
             const confirm = document.getElementById('signup-confirm').value;
-            const btn = signupFormElement.querySelector('button');
-            const originalText = btn.textContent;
+
+            // Validation
+            if (!isValidEmail(email)) {
+                showAuthMessage('Please enter a valid email address.', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showAuthMessage('Password must be at least 6 characters.', 'error');
+                return;
+            }
 
             if (password !== confirm) {
-                alert('Passwords do not match!');
+                showAuthMessage('Passwords do not match!', 'error');
                 return;
             }
 
             try {
-                btn.textContent = 'Creating Account...';
-                btn.disabled = true;
+                showLoading('Creating account...');
 
                 if (!supabase) throw new Error("Supabase client not initialized");
 
@@ -583,19 +667,128 @@ function initializeProfileForms() {
 
                 if (error) throw error;
 
-                if (data.session) {
-                    alert('Account created! You are now logged in.');
-                } else {
-                    alert('Account created! Please check your email to confirm your account.');
-                }
+                // Show OTP verification form
+                showAuthMessage('Account created! Please check your email for the verification code.', 'success');
+                showOTPVerification(email);
 
             } catch (error) {
                 console.error('Signup Error:', error);
-                alert('Signup failed: ' + error.message);
+                if (error.message.includes('already registered')) {
+                    showAuthMessage('This email is already registered. Please login instead.', 'error');
+                } else {
+                    showAuthMessage('Signup failed: ' + error.message, 'error');
+                }
             } finally {
-                btn.textContent = originalText;
-                btn.disabled = false;
+                hideLoading();
             }
+        };
+    }
+
+    // Handle OTP verification
+    const otpFormElement = document.getElementById('otp-verification-form');
+    if (otpFormElement) {
+        console.log('Attaching OTP Listener');
+
+        // Auto-focus next input
+        const otpInputs = document.querySelectorAll('.otp-input');
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length === 1 && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+        });
+
+        otpFormElement.onsubmit = async (e) => {
+            e.preventDefault();
+
+            // Collect OTP code
+            const otpCode = Array.from(otpInputs).map(input => input.value).join('');
+
+            if (otpCode.length !== 6) {
+                showAuthMessage('Please enter the complete 6-digit code.', 'error');
+                return;
+            }
+
+            try {
+                showLoading('Verifying code...');
+
+                const { data, error } = await supabase.auth.verifyOtp({
+                    email: currentUserEmail,
+                    token: otpCode,
+                    type: 'email'
+                });
+
+                if (error) throw error;
+
+                showAuthMessage('Email verified successfully! Redirecting...', 'success');
+                // Redirect handled by onAuthStateChange
+
+            } catch (error) {
+                console.error('OTP Verification Error:', error);
+                showAuthMessage('Invalid or expired code. Please try again.', 'error');
+                // Clear inputs
+                otpInputs.forEach(input => input.value = '');
+                otpInputs[0].focus();
+            } finally {
+                hideLoading();
+            }
+        };
+    }
+
+    // Resend OTP button
+    const resendBtn = document.getElementById('resend-otp-btn');
+    if (resendBtn) {
+        let resendCooldown = false;
+        resendBtn.onclick = async () => {
+            if (resendCooldown) {
+                showAuthMessage('Please wait before requesting another code.', 'error');
+                return;
+            }
+
+            try {
+                showLoading('Sending new code...');
+
+                const { error } = await supabase.auth.signInWithOtp({
+                    email: currentUserEmail
+                });
+
+                if (error) throw error;
+
+                showAuthMessage('New code sent! Check your email.', 'success');
+
+                // Set cooldown
+                resendCooldown = true;
+                resendBtn.disabled = true;
+                resendBtn.textContent = 'Code Sent';
+
+                setTimeout(() => {
+                    resendCooldown = false;
+                    resendBtn.disabled = false;
+                    resendBtn.textContent = 'Resend Code';
+                }, 60000); // 60 second cooldown
+
+            } catch (error) {
+                console.error('Resend Error:', error);
+                showAuthMessage('Failed to resend code. Please try again.', 'error');
+            } finally {
+                hideLoading();
+            }
+        };
+    }
+
+    // Back to login button
+    const backBtn = document.getElementById('back-to-login-btn');
+    if (backBtn) {
+        backBtn.onclick = () => {
+            document.getElementById('otp-form-container').style.display = 'none';
+            document.getElementById('login-form-container').style.display = 'block';
         };
     }
 }

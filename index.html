@@ -145,6 +145,15 @@
             <!-- PROFILE SECTION (Login/Create Account) -->
             <section class="content-section" id="profile-section" style="display: none;">
                 <div class="profile-container">
+                    <!-- Loading Spinner -->
+                    <div class="auth-loading" id="auth-loading" style="display: none;">
+                        <div class="spinner"></div>
+                        <p id="loading-text">Processing...</p>
+                    </div>
+
+                    <!-- Error/Success Messages -->
+                    <div class="auth-message" id="auth-message" style="display: none;"></div>
+
                     <div class="header">
                         <h1 class="header-title">Your Account</h1>
                         <p class="header-subtitle">Login or create a new account to get started</p>
@@ -214,6 +223,28 @@
                             </label>
 
                             <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+                        </form>
+                    </div>
+
+                    <!-- OTP Verification Form (Hidden by default) -->
+                    <div class="auth-form-container" id="otp-form-container" style="display: none;">
+                        <div class="otp-header">
+                            <h2>Verify Your Email</h2>
+                            <p>We've sent a 6-digit code to <strong id="otp-email-display"></strong></p>
+                        </div>
+                        <form class="profile-form" id="otp-verification-form">
+                            <div class="otp-input-group">
+                                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-full">Verify Code</button>
+                            <button type="button" class="btn btn-secondary btn-full" id="resend-otp-btn">Resend
+                                Code</button>
+                            <button type="button" class="btn-link" id="back-to-login-btn">Back to Login</button>
                         </form>
                     </div>
                 </div>

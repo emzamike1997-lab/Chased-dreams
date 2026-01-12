@@ -2233,3 +2233,291 @@ p {
         grid-template-columns: 1fr;
     }
 }
+/* ===================================
+   ENHANCED AUTHENTICATION STYLES
+   =================================== */
+
+/* Loading Spinner */
+.auth-loading {
+    text-align: center;
+    padding: var(--spacing-xl);
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto var(--spacing-md);
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top-color: var(--color-cta);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+#loading-text {
+    color: var(--color-text-body);
+    font-size: 1rem;
+}
+
+/* Auth Messages */
+.auth-message {
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-lg);
+    font-size: 0.9375rem;
+    text-align: center;
+    animation: slideDown 0.3s ease;
+}
+
+.auth-message.error {
+    background-color: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    color: #ff6b6b;
+}
+
+.auth-message.success {
+    background-color: rgba(40, 167, 69, 0.1);
+    border: 1px solid rgba(40, 167, 69, 0.3);
+    color: #51cf66;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Field Errors */
+.field-error {
+    display: block;
+    color: #ff6b6b;
+    font-size: 0.8125rem;
+    margin-top: var(--spacing-xs);
+    min-height: 18px;
+}
+
+/* OTP Verification */
+.otp-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.otp-header h2 {
+    font-size: 1.5rem;
+    color: var(--color-text-body);
+    margin-bottom: var(--spacing-sm);
+}
+
+.otp-header p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9375rem;
+}
+
+.otp-header strong {
+    color: var(--color-cta);
+}
+
+.otp-input-group {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.otp-input {
+    width: 50px;
+    height: 60px;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: var(--font-weight-bold);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--color-text-body);
+    transition: all var(--transition-fast);
+}
+
+.otp-input:focus {
+    outline: none;
+    border-color: var(--color-cta);
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.otp-input::-webkit-outer-spin-button,
+.otp-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: var(--color-cta);
+    font-size: 0.875rem;
+    cursor: pointer;
+    padding: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+    transition: opacity var(--transition-fast);
+}
+
+.btn-link:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+/* Welcome Page Styles */
+.welcome-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+}
+
+.welcome-content {
+    max-width: 600px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: var(--spacing-xxl);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
+    backdrop-filter: blur(10px);
+}
+
+.welcome-icon {
+    font-size: 4rem;
+    color: #51cf66;
+    margin-bottom: var(--spacing-lg);
+    animation: scaleIn 0.5s ease;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.welcome-title {
+    font-size: 2.5rem;
+    color: var(--color-text-body);
+    margin-bottom: var(--spacing-md);
+}
+
+.welcome-email {
+    font-size: 1.25rem;
+    color: var(--color-cta);
+    margin-bottom: var(--spacing-lg);
+    font-weight: var(--font-weight-medium);
+}
+
+.welcome-message {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: var(--spacing-xl);
+    line-height: 1.6;
+}
+
+.welcome-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    margin-bottom: var(--spacing-xxl);
+}
+
+.welcome-features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-xl);
+}
+
+.feature-item {
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    background-color: rgba(255, 255, 255, 0.05);
+    transition: all var(--transition-normal);
+}
+
+.feature-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-5px);
+}
+
+.feature-item i {
+    font-size: 2rem;
+    color: var(--color-cta);
+    margin-bottom: var(--spacing-sm);
+}
+
+.feature-item h3 {
+    font-size: 1.125rem;
+    color: var(--color-text-body);
+    margin-bottom: var(--spacing-xs);
+}
+
+.feature-item p {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Responsive Styles for Auth Components */
+@media (max-width: 768px) {
+    .otp-input {
+        width: 40px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+
+    .otp-input-group {
+        gap: var(--spacing-xs);
+    }
+
+    .welcome-content {
+        padding: var(--spacing-xl);
+    }
+
+    .welcome-title {
+        font-size: 2rem;
+    }
+
+    .welcome-features {
+        grid-template-columns: 1fr;
+    }
+
+    .welcome-actions {
+        flex-direction: column;
+    }
+
+    .welcome-actions .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .otp-input {
+        width: 35px;
+        height: 45px;
+        font-size: 1.125rem;
+    }
+
+    .welcome-title {
+        font-size: 1.75rem;
+    }
+
+    .welcome-email {
+        font-size: 1rem;
+    }
+}

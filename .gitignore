@@ -1,0 +1,5 @@
+chased-web/
+node_modules/
+.vercel/
+*.log
+.DS_Store
