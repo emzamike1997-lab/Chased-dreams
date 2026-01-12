@@ -298,478 +298,149 @@ function removeFromCart(index) {
 // ===================================
 // USER AUTHENTICATION
 // ===================================
+
+
+// Initialize Supabase Client
+const supabaseUrl = 'https://keznpnwibyphyvjbslox.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtlem5wbndpYnlwaHl2amJzbG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxODE0MzIsImV4cCI6MjA4Mzc1NzQyMn0.efisBO6y3ySFV9InD2boDIIWpBnFVpKfsMBGH7K9OTM';
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
 function initializeAuth() {
-    // Profile link now uses navigation system
-    // No need for separate auth modal
-}
-
-function handleLogin() {
-    const email = document.getElementById('auth-email').value;
-    const password = document.getElementById('auth-password').value;
-
-    if (email && password) {
-        alert('Login successful!');
-        document.getElementById('auth-modal').classList.remove('active');
-    }
-}
-
-function handleCreateAccount() {
-    alert('Create Account feature coming soon!');
-}
-
-// ===================================
-// SELL MENU
-// ===================================
-function initializeSellMenu() {
-    const popButton = document.getElementById('popButton');
-
-    if (popButton) {
-        // Double-click to show sell menu
-        popButton.addEventListener('dblclick', showSellMenu);
-
-        // Right-click to show sell menu
-        popButton.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-            showSellMenu();
-        });
-    }
-}
-
-function showSellMenu() {
-    let sellModal = document.getElementById('sell-modal');
-
-    if (!sellModal) {
-        const modalHTML = `
-            <div class="modal" id="sell-modal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2 class="modal-title">Sell on CHASED</h2>
-                        <button class="modal-close" id="close-sell-modal">&times;</button>
-                    </div>
-                    <div class="sell-options">
-                        <p>Choose an option below to start selling:</p>
-                        <button class="btn btn-primary"><i class="fas fa-plus-circle"></i> List New Item</button>
-                        <button class="btn btn-secondary"><i class="fas fa-box"></i> My Listings</button>
-                        <button class="btn btn-secondary"><i class="fas fa-chart-line"></i> Sales Dashboard</button>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-        sellModal = document.getElementById('sell-modal');
-
-        document.getElementById('close-sell-modal').addEventListener('click', () => {
-            sellModal.classList.remove('active');
-        });
-
-        // Close on background click
-        sellModal.addEventListener('click', (e) => {
-            if (e.target === sellModal) {
-                sellModal.classList.remove('active');
-            }
-        });
-    }
-
-    sellModal.classList.add('active');
-}
-
-// ===================================
-// IMAGE VIEWER WITH ZOOM & ROTATION
-// ===================================
-function initializeImageViewer() {
-    // Add click handlers to all product images
-    const productImages = document.querySelectorAll('.product-image');
-    productImages.forEach(img => {
-        img.style.cursor = 'pointer';
-        img.addEventListener('click', (e) => {
-            e.stopPropagation();
-            openImageViewer(img);
-        });
+    // Listen for auth state changes
+    supabase.auth.onAuthStateChange((event, session) => {
+        updateAuthUI(session);
     });
+
+    // Check initial session
+    checkSession();
 }
 
-function openImageViewer(imageElement) {
-    // Get product information
-    const productCard = imageElement.closest('.product-card');
-    const productName = productCard.querySelector('.product-name').textContent;
-    const productPrice = productCard.querySelector('.product-price').textContent;
-    const imageSrc = imageElement.src;
+async function checkSession() {
+    const { data: { session } } = await supabase.auth.getSession();
+    updateAuthUI(session);
+}
 
-    // Reset zoom and rotation
-    currentZoom = 1;
-    currentRotation = 0;
+function updateAuthUI(session) {
+    const loginContainer = document.querySelector('.profile-container');
 
-    // Create or get viewer modal
-    let viewerModal = document.getElementById('image-viewer-modal');
-
-    if (!viewerModal) {
-        const modalHTML = `
-            <div class="modal image-viewer-modal" id="image-viewer-modal">
-                <div class="image-viewer-content">
-                    <div class="viewer-header">
-                        <div class="viewer-product-info">
-                            <h3 id="viewer-product-name">${productName}</h3>
-                            <p id="viewer-product-price">${productPrice}</p>
-                        </div>
-                        <button class="modal-close" id="close-viewer-modal">&times;</button>
-                    </div>
-                    
-                    <div class="viewer-image-container">
-                        <img src="${imageSrc}" alt="${productName}" id="viewer-image" class="viewer-image">
-                    </div>
-                    
-                    <div class="viewer-controls">
-                        <div class="zoom-controls">
-                            <button class="control-btn" id="zoom-out" title="Zoom Out">
-                                <i class="fas fa-search-minus"></i>
-                            </button>
-                            <button class="control-btn" id="zoom-reset" title="Reset Zoom">
-                                <i class="fas fa-compress"></i>
-                            </button>
-                            <button class="control-btn" id="zoom-in" title="Zoom In">
-                                <i class="fas fa-search-plus"></i>
-                            </button>
-                        </div>
-                        
-                        <div class="rotation-controls">
-                            <button class="control-btn" id="rotate-left" title="Rotate Left">
-                                <i class="fas fa-undo"></i>
-                            </button>
-                            <button class="control-btn" id="rotate-360" title="360° View">
-                                <i class="fas fa-sync"></i> 360°
-                            </button>
-                            <button class="control-btn" id="rotate-right" title="Rotate Right">
-                                <i class="fas fa-redo"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-        viewerModal = document.getElementById('image-viewer-modal');
-
-        // Setup event listeners
-        setupImageViewerControls();
+    if (session) {
+        // User is logged in
+        renderLoggedInView(session.user, loginContainer);
     } else {
-        // Update existing modal with new image
-        document.getElementById('viewer-product-name').textContent = productName;
-        document.getElementById('viewer-product-price').textContent = productPrice;
-        document.getElementById('viewer-image').src = imageSrc;
-        document.getElementById('viewer-image').alt = productName;
+        // User is logged out
+        renderLoggedOutView(loginContainer);
     }
-
-    // Show modal
-    viewerModal.classList.add('active');
-
-    // Change background to light cyan
-    document.body.classList.add('image-viewer-active');
-
-    // Reset image transform
-    updateImageTransform();
 }
 
-function setupImageViewerControls() {
-    const viewerModal = document.getElementById('image-viewer-modal');
-    const viewerImage = document.getElementById('viewer-image');
+function renderLoggedInView(user, container) {
+    if (!container) return;
+    const userEmail = user.email;
+    const userName = user.user_metadata.full_name || 'User';
 
-    // Close button
-    document.getElementById('close-viewer-modal').addEventListener('click', () => {
-        viewerModal.classList.remove('active');
-        document.body.classList.remove('image-viewer-active');
-    });
+    container.innerHTML = `
+        <div class="header">
+            <h1 class="header-title">Welcome Back</h1>
+            <p class="header-subtitle">${userName}</p>
+        </div>
+        
+        <div class="user-dashboard" style="text-align: center; margin-top: 2rem;">
+            <div class="user-avatar" style="width: 80px; height: 80px; background: #333; color: #fff; border-radius: 50%; font-size: 2rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                ${userName.charAt(0).toUpperCase()}
+            </div>
+            <p style="margin-bottom: 2rem; color: #666;">${userEmail}</p>
+            
+            <div class="dashboard-actions">
+                <button id="logout-btn" class="btn btn-secondary">Sign Out</button>
+            </div>
+        </div>
+    `;
 
-    // Close on background click
-    viewerModal.addEventListener('click', (e) => {
-        if (e.target === viewerModal) {
-            viewerModal.classList.remove('active');
-            document.body.classList.remove('image-viewer-active');
-        }
-    });
-
-    // Zoom controls
-    document.getElementById('zoom-in').addEventListener('click', () => {
-        currentZoom = Math.min(currentZoom + 0.25, 3);
-        updateImageTransform();
-    });
-
-    document.getElementById('zoom-out').addEventListener('click', () => {
-        currentZoom = Math.max(currentZoom - 0.25, 0.5);
-        updateImageTransform();
-    });
-
-    document.getElementById('zoom-reset').addEventListener('click', () => {
-        currentZoom = 1;
-        currentRotation = 0;
-        updateImageTransform();
-    });
-
-    // Rotation controls
-    document.getElementById('rotate-left').addEventListener('click', () => {
-        currentRotation -= 90;
-        updateImageTransform();
-    });
-
-    document.getElementById('rotate-right').addEventListener('click', () => {
-        currentRotation += 90;
-        updateImageTransform();
-    });
-
-    document.getElementById('rotate-360').addEventListener('click', () => {
-        animate360Rotation();
-    });
-
-    // Mouse wheel zoom (optional enhancement)
-    viewerImage.addEventListener('wheel', (e) => {
-        e.preventDefault();
-        if (e.deltaY < 0) {
-            currentZoom = Math.min(currentZoom + 0.1, 3);
-        } else {
-            currentZoom = Math.max(currentZoom - 0.1, 0.5);
-        }
-        updateImageTransform();
-    });
-}
-
-function updateImageTransform() {
-    const viewerImage = document.getElementById('viewer-image');
-    viewerImage.style.transform = `scale(${currentZoom}) rotate(${currentRotation}deg)`;
-}
-
-function animate360Rotation() {
-    const viewerImage = document.getElementById('viewer-image');
-    let rotationStep = 0;
-    const totalSteps = 36; // 10 degree increments
-    const interval = 30; // milliseconds
-
-    const rotationInterval = setInterval(() => {
-        rotationStep++;
-        currentRotation = (rotationStep * 10) % 360;
-        updateImageTransform();
-
-        if (rotationStep >= totalSteps) {
-            clearInterval(rotationInterval);
-            currentRotation = 0;
-            updateImageTransform();
-        }
-    }, interval);
-}
-
-// ===================================
-// SECTION NAVIGATION (Home, Buy, Sell, Profile)
-// ===================================
-function initializeNavigation() {
-    // Add click handlers to navigation links with data-section attribute
-    const navLinks = document.querySelectorAll('.nav-link[data-section], .mobile-nav-link[data-section], .mobile-nav-icon[data-section]');
-
-    navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const sectionName = link.getAttribute('data-section');
-            navigateToSection(sectionName);
-        });
-    });
-}
-
-// Global function to navigate between sections
-function navigateToSection(sectionName) {
-    // Hide all sections
-    const allSections = document.querySelectorAll('.content-section');
-    allSections.forEach(section => {
-        section.style.display = 'none';
-        section.classList.remove('active');
-    });
-
-    // Show target section
-    const targetSection = document.getElementById(`${sectionName}-section`);
-    if (targetSection) {
-        targetSection.style.display = 'block';
-        targetSection.classList.add('active');
-    }
-
-    // Update active state in navigation
-    const allNavLinks = document.querySelectorAll('.nav-link[data-section]');
-    allNavLinks.forEach(link => {
-        link.classList.remove('active');
-    });
-
-    const activeLink = document.querySelector(`.nav-link[data-section="${sectionName}"]`);
-    if (activeLink) {
-        activeLink.classList.add('active');
-    }
-
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// Make navigateToSection globally accessible
-window.navigateToSection = navigateToSection;
-
-// ===================================
-// HEADER MINI-INTERACTIONS (Help, Contact)
-// ===================================
-function initializeHeaderInteractions() {
-    const helpLinks = [document.getElementById('help-link'), document.getElementById('mobile-help-link')];
-    const contactLinks = [document.getElementById('contact-link'), document.getElementById('mobile-contact-link')];
-    const helpModal = document.getElementById('help-modal');
-    const contactModal = document.getElementById('contact-modal');
-    const closeHelp = document.getElementById('close-help');
-    const closeContact = document.getElementById('close-contact');
-
-    // Help Links
-    helpLinks.forEach(link => {
-        if (link && helpModal) {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                helpModal.classList.add('active');
-            });
-        }
-    });
-
-    // Contact Links
-    contactLinks.forEach(link => {
-        if (link && contactModal) {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                contactModal.classList.add('active');
-            });
-        }
-    });
-
-    [closeHelp, closeContact].forEach(btn => {
-        if (btn) {
-            btn.addEventListener('click', () => {
-                const modal = btn.closest('.modal');
-                if (modal) modal.classList.remove('active');
-            });
-        }
-    });
-
-    // Close modals on outside click
-    [helpModal, contactModal].forEach(modal => {
-        if (modal) {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.classList.remove('active');
-                }
-            });
-        }
-    });
-}
-// Handle contact form submission
-const contactForm = document.getElementById('contact-form');
-if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const btn = contactForm.querySelector('button');
-        const originalText = btn.textContent;
-        btn.textContent = 'Sending...';
-        btn.disabled = true;
-
-        setTimeout(() => {
-            alert('Thank you for your message. CHASED support will contact you shortly.');
-            btn.textContent = originalText;
-            btn.disabled = false;
-            contactForm.reset();
-            contactModal.classList.remove('active');
-        }, 1000);
-    });
-}
-
-// ===================================
-// HEADER SEARCH TOGGLE
-// ===================================
-function initializeHeaderSearch() {
-    // Desktop Search
-    const searchContainer = document.getElementById('header-search');
-    const searchToggle = document.getElementById('search-toggle');
-    const searchInput = document.getElementById('search-input');
-
-    // Mobile Search
-    const mobileSearchContainer = document.getElementById('mobile-header-search');
-    const mobileSearchToggle = document.getElementById('mobile-search-toggle');
-    const mobileSearchInput = document.getElementById('mobile-search-input');
-    const mobileSearchClose = document.getElementById('mobile-search-close');
-
-    function handleSearchEnter(e, input, container) {
-        if (e.key === 'Enter') {
-            const query = input.value.toLowerCase().trim();
-            let categoryToSelect = '';
-
-            const keywords = {
-                pants: ['pants', 'trousers', 'jeans', 'leggings', 'bottoms', 'slacks'],
-                jewelry: ['jewelry', 'jewelary', 'accessory', 'necklace', 'ring', 'earring', 'bracelet', 'gem', 'gold', 'silver'],
-                tops: ['tops', 'top', 'shirt', 'blouse', 'sweater', 'tshirt', 'tee', 'hoodie', 'jacket', 'coat'],
-                dresses: ['dresses', 'dress', 'gown', 'skirt', 'maxi', 'mini', 'midi'],
-                footwear: ['footwear', 'shoes', 'shoe', 'boots', 'sneakers', 'heels', 'sandals', 'flats']
-            };
-
-            for (const [category, synonyms] of Object.entries(keywords)) {
-                if (synonyms.some(syn => query.includes(syn))) {
-                    categoryToSelect = category;
-                    break;
-                }
-            }
-
-            if (categoryToSelect) {
-                navigateToSection('buy');
-                const tab = document.querySelector(`.category-tab[data-category="${categoryToSelect}"]`);
-                if (tab) tab.click();
-                input.value = '';
-                container.classList.remove('expanded');
-            }
-        }
-    }
-
-    // Desktop Event Listeners
-    if (searchToggle && searchContainer && searchInput) {
-        searchToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            searchContainer.classList.toggle('expanded');
-            if (searchContainer.classList.contains('expanded')) searchInput.focus();
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!searchContainer.contains(e.target)) searchContainer.classList.remove('expanded');
-        });
-
-        searchInput.addEventListener('click', (e) => e.stopPropagation());
-        searchInput.addEventListener('keydown', (e) => handleSearchEnter(e, searchInput, searchContainer));
-    }
-
-    // Mobile Event Listeners
-    if (mobileSearchToggle && mobileSearchContainer && mobileSearchInput) {
-        mobileSearchToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            mobileSearchContainer.classList.add('expanded');
-            mobileSearchInput.focus();
-        });
-
-        if (mobileSearchClose) {
-            mobileSearchClose.addEventListener('click', (e) => {
-                e.stopPropagation();
-                mobileSearchContainer.classList.remove('expanded');
-            });
-        }
-
-        mobileSearchInput.addEventListener('click', (e) => e.stopPropagation());
-        mobileSearchInput.addEventListener('keydown', (e) => handleSearchEnter(e, mobileSearchInput, mobileSearchContainer));
-
-        // Re-use desktop click behavior to close mobile search if needed, 
-        // but mobile search has a dedicated close button too.
-        document.addEventListener('click', (e) => {
-            if (!mobileSearchContainer.contains(e.target)) {
-                mobileSearchContainer.classList.remove('expanded');
-            }
+    // Attach logout listener
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            const { error } = await supabase.auth.signOut();
+            if (error) alert('Error signing out: ' + error.message);
         });
     }
 }
 
-// ===================================
-// PROFILE FORMS (Login/Create Account)
-// ===================================
+function renderLoggedOutView(container) {
+    if (!container) return;
+    // Restore original login forms
+    container.innerHTML = `
+        <div class="header">
+            <h1 class="header-title">Your Account</h1>
+            <p class="header-subtitle">Login or create a new account to get started</p>
+        </div>
+
+        <div class="auth-tabs">
+            <button class="auth-tab active" id="login-tab">Login</button>
+            <button class="auth-tab" id="signup-tab">Create Account</button>
+        </div>
+
+        <!-- Login Form -->
+        <div class="auth-form-container" id="login-form-container">
+            <form class="profile-form" id="profile-login-form">
+                <div class="form-group">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" class="form-input" placeholder="your@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" class="form-input" placeholder="Enter your password" required>
+                </div>
+
+                <div class="form-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="remember-me">
+                        <span>Remember me</span>
+                    </label>
+                    <a href="#" class="forgot-password">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">Login</button>
+            </form>
+        </div>
+
+        <!-- Create Account Form -->
+        <div class="auth-form-container" id="signup-form-container" style="display: none;">
+            <form class="profile-form" id="profile-signup-form">
+                <div class="form-group">
+                    <label for="signup-name">Full Name</label>
+                    <input type="text" id="signup-name" class="form-input" placeholder="John Doe" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="signup-email">Email Address</label>
+                    <input type="email" id="signup-email" class="form-input" placeholder="your@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" class="form-input" placeholder="Create a strong password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="signup-confirm">Confirm Password</label>
+                    <input type="password" id="signup-confirm" class="form-input" placeholder="Re-enter your password" required>
+                </div>
+
+                <label class="checkbox-label">
+                    <input type="checkbox" id="terms-agree" required>
+                    <span>I agree to the Terms of Service and Privacy Policy</span>
+                </label>
+
+                <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+            </form>
+        </div>
+    `;
+
+    // Re-initialize listeners since we replaced DOM
+    initializeProfileForms();
+}
+
 function initializeProfileForms() {
     const loginTab = document.getElementById('login-tab');
     const signupTab = document.getElementById('signup-tab');
@@ -796,28 +467,78 @@ function initializeProfileForms() {
     // Handle login form submission
     const loginFormElement = document.getElementById('profile-login-form');
     if (loginFormElement) {
-        loginFormElement.addEventListener('submit', (e) => {
+        loginFormElement.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('login-email').value;
-            alert(`Login successful for ${email}!`);
+            const password = document.getElementById('login-password').value;
+            const btn = loginFormElement.querySelector('button');
+            const originalText = btn.textContent;
+
+            try {
+                btn.textContent = 'Logging in...';
+                btn.disabled = true;
+
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                });
+
+                if (error) throw error;
+                // Success handled by onAuthStateChange
+            } catch (error) {
+                alert('Login failed: ' + error.message);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
         });
     }
 
     // Handle signup form submission
     const signupFormElement = document.getElementById('profile-signup-form');
     if (signupFormElement) {
-        signupFormElement.addEventListener('submit', (e) => {
+        signupFormElement.addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
             const confirm = document.getElementById('signup-confirm').value;
+            const btn = signupFormElement.querySelector('button');
+            const originalText = btn.textContent;
 
             if (password !== confirm) {
                 alert('Passwords do not match!');
                 return;
             }
 
-            alert(`Account created successfully for ${name}!`);
+            try {
+                btn.textContent = 'Creating Account...';
+                btn.disabled = true;
+
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            full_name: name
+                        }
+                    }
+                });
+
+                if (error) throw error;
+
+                if (data.session) {
+                    alert('Account created! You are now logged in.');
+                } else {
+                    alert('Account created! Please check your email to confirm your account.');
+                }
+
+            } catch (error) {
+                alert('Signup failed: ' + error.message);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
         });
     }
 }
