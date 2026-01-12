@@ -11,21 +11,56 @@ let currentRotation = 0;
 let currentZoom = 1;
 
 // Initialize when DOM is loaded
+// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    initializeSidebar();
-    initializeCart();
-    initializeAuth();
-    initializeSellMenu();
-    initializeImageViewer();
-    initializeNavigation();
-    initializeHeaderSearch();
-    initializeProfileForms();
-    initializeProductCategories();
-    initializeHeaderInteractions();
-    initializeMobileCart();
+    console.log('CHASED Website Initializing...');
+    try {
+        initializeSidebar();
+    } catch (e) { console.error('Error initializing sidebar:', e); }
+
+    try {
+        initializeCart();
+    } catch (e) { console.error('Error initializing cart:', e); }
+
+    try {
+        initializeAuth();
+    } catch (e) { console.error('Error initializing auth:', e); }
+
+    try {
+        initializeSellMenu();
+    } catch (e) { console.error('Error initializing sell menu:', e); }
+
+    try {
+        initializeImageViewer();
+    } catch (e) { console.error('Error initializing image viewer:', e); }
+
+    try {
+        initializeNavigation();
+    } catch (e) { console.error('Error initializing navigation:', e); }
+
+    try {
+        initializeHeaderSearch();
+    } catch (e) { console.error('Error initializing header search:', e); }
+
+    try {
+        initializeProfileForms();
+    } catch (e) { console.error('Error initializing profile forms:', e); }
+
+    try {
+        initializeProductCategories();
+    } catch (e) { console.error('Error initializing product categories:', e); }
+
+    try {
+        initializeHeaderInteractions();
+    } catch (e) { console.error('Error initializing header interactions:', e); }
+
+    try {
+        initializeMobileCart();
+    } catch (e) { console.error('Error initializing mobile cart:', e); }
 
     // Set home section as default landing page
     navigateToSection('home');
+    console.log('CHASED Website Initialization Complete');
 });
 
 function initializeMobileCart() {
