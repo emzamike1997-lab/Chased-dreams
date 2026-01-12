@@ -2233,6 +2233,7 @@ p {
         grid-template-columns: 1fr;
     }
 }
+
 /* ===================================
    ENHANCED AUTHENTICATION STYLES
    =================================== */
@@ -2254,7 +2255,9 @@ p {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 #loading-text {
@@ -2289,6 +2292,7 @@ p {
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -2405,6 +2409,7 @@ p {
         transform: scale(0);
         opacity: 0;
     }
+
     to {
         transform: scale(1);
         opacity: 1;
@@ -2521,14 +2526,68 @@ p {
         font-size: 1rem;
     }
 }
+
 /* ===================================
    DYNAMIC STARTUP ANIMATIONS
    =================================== */
 
+/* Initial States - Prevents Flash of Unstyled Content */
+.sidebar,
+.main-content,
+.header,
+.site-header,
+.hero-content,
+.hero-title,
+.hero-subtitle,
+.hero-description,
+.hero-actions,
+.product-card,
+.feature-card,
+.category-tab,
+.sell-card,
+.nav-item,
+.pop-button {
+    opacity: 0;
+}
+
+/* Specific Transform Initial States */
+.sidebar,
+.nav-item {
+    transform: translateX(-100px);
+}
+
+.header,
+.site-header {
+    transform: translateY(-50px);
+}
+
+.hero-title,
+.hero-subtitle,
+.hero-description,
+.hero-actions,
+.feature-card,
+.category-tab {
+    transform: translateY(50px);
+}
+
+.product-card,
+.sell-card {
+    transform: scale(0.8);
+}
+
+.pop-button {
+    transform: scale(0);
+}
+
 /* Core Keyframe Animations */
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes slideInLeft {
@@ -2536,6 +2595,7 @@ p {
         opacity: 0;
         transform: translateX(-100px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -2547,6 +2607,7 @@ p {
         opacity: 0;
         transform: translateX(100px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -2558,6 +2619,7 @@ p {
         opacity: 0;
         transform: translateY(50px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -2569,6 +2631,7 @@ p {
         opacity: 0;
         transform: translateY(-50px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -2576,63 +2639,184 @@ p {
 }
 
 @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
 }
 
 @keyframes shimmer {
-    0% { background-position: -1000px 0; }
-    100% { background-position: 1000px 0; }
+    0% {
+        background-position: -1000px 0;
+    }
+
+    100% {
+        background-position: 1000px 0;
+    }
 }
 
 @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
 }
 
 @keyframes glow {
-    0%, 100% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.2); }
-    50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.4), 0 0 30px rgba(255, 255, 255, 0.2); }
+
+    0%,
+    100% {
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.4), 0 0 30px rgba(255, 255, 255, 0.2);
+    }
 }
 
 /* Apply Entrance Animations */
-.sidebar { animation: slideInLeft 0.6s ease-out; }
-.main-content { animation: fadeIn 0.8s ease-out; }
-.header { animation: slideInDown 0.5s ease-out; }
-.hero-content { animation: fadeIn 1s ease-out, slideInUp 0.8s ease-out; }
-.hero-title { animation: slideInUp 0.8s ease-out 0.2s backwards; }
-.hero-subtitle { animation: slideInUp 0.8s ease-out 0.4s backwards; }
-.hero-description { animation: slideInUp 0.8s ease-out 0.6s backwards; }
-.hero-actions { animation: slideInUp 0.8s ease-out 0.8s backwards; }
+.sidebar {
+    animation: slideInLeft 0.6s ease-out forwards;
+}
+
+.main-content {
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+.header {
+    animation: slideInDown 0.5s ease-out forwards;
+}
+
+.site-header {
+    animation: slideInDown 0.5s ease-out forwards;
+}
+
+.pop-button {
+    animation: scaleIn 0.5s ease-out 0.7s forwards;
+}
+
+.hero-content {
+    animation: fadeIn 1s ease-out forwards, slideInUp 0.8s ease-out forwards;
+}
+
+.hero-title {
+    animation: slideInUp 0.8s ease-out 0.2s forwards;
+}
+
+.hero-subtitle {
+    animation: slideInUp 0.8s ease-out 0.4s forwards;
+}
+
+.hero-description {
+    animation: slideInUp 0.8s ease-out 0.6s forwards;
+}
+
+.hero-actions {
+    animation: slideInUp 0.8s ease-out 0.8s forwards;
+}
 
 /* Product Cards Staggered Animation */
-.product-card { animation: scaleIn 0.5s ease-out backwards; }
-.product-card:nth-child(1) { animation-delay: 0.1s; }
-.product-card:nth-child(2) { animation-delay: 0.2s; }
-.product-card:nth-child(3) { animation-delay: 0.3s; }
-.product-card:nth-child(4) { animation-delay: 0.4s; }
-.product-card:nth-child(5) { animation-delay: 0.5s; }
-.product-card:nth-child(6) { animation-delay: 0.6s; }
-.product-card:nth-child(7) { animation-delay: 0.7s; }
-.product-card:nth-child(8) { animation-delay: 0.8s; }
+.product-card {
+    animation: scaleIn 0.5s ease-out forwards;
+}
+
+.product-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.product-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.product-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.product-card:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.product-card:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+.product-card:nth-child(6) {
+    animation-delay: 0.6s;
+}
+
+.product-card:nth-child(7) {
+    animation-delay: 0.7s;
+}
+
+.product-card:nth-child(8) {
+    animation-delay: 0.8s;
+}
 
 /* Feature Cards Animation */
-.feature-card { animation: slideInUp 0.6s ease-out backwards; }
-.feature-card:nth-child(1) { animation-delay: 0.2s; }
-.feature-card:nth-child(2) { animation-delay: 0.3s; }
-.feature-card:nth-child(3) { animation-delay: 0.4s; }
-.feature-card:nth-child(4) { animation-delay: 0.5s; }
+.feature-card {
+    animation: slideInUp 0.6s ease-out forwards;
+}
+
+.feature-card:nth-child(1) {
+    animation-delay: 0.2s;
+}
+
+.feature-card:nth-child(2) {
+    animation-delay: 0.3s;
+}
+
+.feature-card:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+.feature-card:nth-child(4) {
+    animation-delay: 0.5s;
+}
 
 /* Category Tabs Animation */
-.category-tab { animation: slideInUp 0.5s ease-out backwards; position: relative; overflow: hidden; }
-.category-tab:nth-child(1) { animation-delay: 0.1s; }
-.category-tab:nth-child(2) { animation-delay: 0.15s; }
-.category-tab:nth-child(3) { animation-delay: 0.2s; }
-.category-tab:nth-child(4) { animation-delay: 0.25s; }
-.category-tab:nth-child(5) { animation-delay: 0.3s; }
+.category-tab {
+    animation: slideInUp 0.5s ease-out forwards;
+    position: relative;
+    overflow: hidden;
+}
+
+.category-tab:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.category-tab:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.category-tab:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.category-tab:nth-child(4) {
+    animation-delay: 0.25s;
+}
+
+.category-tab:nth-child(5) {
+    animation-delay: 0.3s;
+}
 
 /* Enhanced Button Hover */
-.btn { position: relative; overflow: hidden; transition: all 0.3s ease; }
+.btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
 .btn::before {
     content: '';
     position: absolute;
@@ -2645,18 +2829,38 @@ p {
     transform: translate(-50%, -50%);
     transition: width 0.6s, height 0.6s;
 }
-.btn:hover::before { width: 300px; height: 300px; }
-.btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2); }
-.btn:active { transform: translateY(0); }
+
+.btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
 
 /* Product Card Enhanced Hover */
-.product-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.product-card {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
 .product-card:hover {
     transform: translateY(-12px) scale(1.02);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.1);
 }
-.product-card:hover .product-image { transform: scale(1.1); }
-.product-image { transition: transform 0.5s ease; }
+
+.product-card:hover .product-image {
+    transform: scale(1.1);
+}
+
+.product-image {
+    transition: transform 0.5s ease;
+}
 
 /* Navigation Link Ripple */
 .nav-link::after {
@@ -2671,16 +2875,33 @@ p {
     transform: translate(-50%, -50%);
     transition: width 0.5s, height 0.5s;
 }
-.nav-link:hover::after { width: 300px; height: 300px; }
+
+.nav-link:hover::after {
+    width: 300px;
+    height: 300px;
+}
 
 /* Feature Card Float */
-.feature-card:hover { animation: float 2s ease-in-out infinite; }
+.feature-card:hover {
+    animation: float 2s ease-in-out infinite;
+}
 
 /* Sell Card Animation */
-.sell-card { animation: scaleIn 0.5s ease-out backwards; }
-.sell-card:nth-child(1) { animation-delay: 0.1s; }
-.sell-card:nth-child(2) { animation-delay: 0.2s; }
-.sell-card:nth-child(3) { animation-delay: 0.3s; }
+.sell-card {
+    animation: scaleIn 0.5s ease-out forwards;
+}
+
+.sell-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.sell-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.sell-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
 
 /* Category Tab Underline */
 .category-tab::after {
@@ -2693,8 +2914,14 @@ p {
     background: var(--color-cta);
     transition: width 0.3s ease;
 }
-.category-tab:hover::after { width: 100%; }
-.category-tab.active::after { width: 100%; }
+
+.category-tab:hover::after {
+    width: 100%;
+}
+
+.category-tab.active::after {
+    width: 100%;
+}
 
 /* Shimmer for Brand */
 .brand-name {
@@ -2707,24 +2934,54 @@ p {
 }
 
 /* Glow for CTAs */
-.btn-primary:hover { animation: glow 1.5s ease-in-out infinite; }
+.btn-primary:hover {
+    animation: glow 1.5s ease-in-out infinite;
+}
 
 /* Section Transitions */
-.content-section { animation: fadeIn 0.5s ease-out; }
+.content-section {
+    animation: fadeIn 0.5s ease-out;
+}
 
 /* Nav Items Stagger */
-.nav-item { animation: slideInLeft 0.5s ease-out backwards; }
-.nav-item:nth-child(1) { animation-delay: 0.1s; }
-.nav-item:nth-child(2) { animation-delay: 0.15s; }
-.nav-item:nth-child(3) { animation-delay: 0.2s; }
-.nav-item:nth-child(4) { animation-delay: 0.25s; }
-.nav-item:nth-child(5) { animation-delay: 0.3s; }
-.nav-item:nth-child(6) { animation-delay: 0.35s; }
-.nav-item:nth-child(7) { animation-delay: 0.4s; }
+.nav-item {
+    animation: slideInLeft 0.5s ease-out forwards;
+}
+
+.nav-item:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.nav-item:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.nav-item:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.nav-item:nth-child(4) {
+    animation-delay: 0.25s;
+}
+
+.nav-item:nth-child(5) {
+    animation-delay: 0.3s;
+}
+
+.nav-item:nth-child(6) {
+    animation-delay: 0.35s;
+}
+
+.nav-item:nth-child(7) {
+    animation-delay: 0.4s;
+}
 
 /* Reduce motion preference */
 @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+
+    *,
+    *::before,
+    *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
