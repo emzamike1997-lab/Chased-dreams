@@ -395,6 +395,15 @@ function renderLoggedInView(user, container) {
 
 function renderLoggedOutView(container) {
     if (!container) return;
+
+    // check if login form already exists to avoid unnecessary re-render
+    if (document.getElementById('profile-login-form')) {
+        console.log('Logged out view already current, skipping render');
+        // Ensure listeners are attached even if we don't re-render
+        initializeProfileForms();
+        return;
+    }
+
     // Restore original login forms
     container.innerHTML = `
         <div class="header">
@@ -470,6 +479,11 @@ function renderLoggedOutView(container) {
 }
 
 function initializeProfileForms() {
+    console.log('Initializing Profile Forms Logic...');
+
+    // Remove old listeners to prevent duplicates (not easily possible with anon functions, 
+    // but the check above prevents re-rendering which is the main cause)
+
     const loginTab = document.getElementById('login-tab');
     const signupTab = document.getElementById('signup-tab');
     const loginForm = document.getElementById('login-form-container');
@@ -477,26 +491,31 @@ function initializeProfileForms() {
 
     if (loginTab && signupTab && loginForm && signupForm) {
         // Tab switching
-        loginTab.addEventListener('click', () => {
+        loginTab.onclick = () => {
             loginTab.classList.add('active');
             signupTab.classList.remove('active');
             loginForm.style.display = 'block';
             signupForm.style.display = 'none';
-        });
+        };
 
-        signupTab.addEventListener('click', () => {
+        signupTab.onclick = () => {
             signupTab.classList.add('active');
             loginTab.classList.remove('active');
             signupForm.style.display = 'block';
             loginForm.style.display = 'none';
-        });
+        };
     }
 
     // Handle login form submission
     const loginFormElement = document.getElementById('profile-login-form');
     if (loginFormElement) {
-        loginFormElement.addEventListener('submit', async (e) => {
+        console.log('Attaching Login Listener');
+        // Use onclick on the button instead of submit on form to be safer? 
+        // No, form submit is better for enter key support. 
+        // We set onsubmit property to avoid multiple listeners if this function is called multiple times
+        loginFormElement.onsubmit = async (e) => {
             e.preventDefault();
+            console.log('Login Form Submitted');
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
             const btn = loginFormElement.querySelector('button');
@@ -506,6 +525,8 @@ function initializeProfileForms() {
                 btn.textContent = 'Logging in...';
                 btn.disabled = true;
 
+                if (!supabase) throw new Error("Supabase client not initialized");
+
                 const { data, error } = await supabase.auth.signInWithPassword({
                     email,
                     password
@@ -514,19 +535,24 @@ function initializeProfileForms() {
                 if (error) throw error;
                 // Success handled by onAuthStateChange
             } catch (error) {
+                console.error('Login Error:', error);
                 alert('Login failed: ' + error.message);
             } finally {
                 btn.textContent = originalText;
                 btn.disabled = false;
             }
-        });
+        };
+    } else {
+        console.error('Login Form Element NOT FOUND');
     }
 
     // Handle signup form submission
     const signupFormElement = document.getElementById('profile-signup-form');
     if (signupFormElement) {
-        signupFormElement.addEventListener('submit', async (e) => {
+        console.log('Attaching Signup Listener');
+        signupFormElement.onsubmit = async (e) => {
             e.preventDefault();
+            console.log('Signup Form Submitted');
             const name = document.getElementById('signup-name').value;
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
@@ -542,6 +568,8 @@ function initializeProfileForms() {
             try {
                 btn.textContent = 'Creating Account...';
                 btn.disabled = true;
+
+                if (!supabase) throw new Error("Supabase client not initialized");
 
                 const { data, error } = await supabase.auth.signUp({
                     email,
@@ -562,12 +590,13 @@ function initializeProfileForms() {
                 }
 
             } catch (error) {
+                console.error('Signup Error:', error);
                 alert('Signup failed: ' + error.message);
             } finally {
                 btn.textContent = originalText;
                 btn.disabled = false;
             }
-        });
+        };
     }
 }
 
