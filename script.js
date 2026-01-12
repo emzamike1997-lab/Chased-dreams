@@ -836,19 +836,19 @@ function initializeProductCategories() {
 // Initialize animations on page load
 function initializeAnimations() {
     console.log('Initializing dynamic animations...');
-    
+
     // Add scroll-triggered animations
     initializeScrollAnimations();
-    
+
     // Add smooth scroll behavior
     initializeSmoothScroll();
-    
+
     // Add parallax effect to background
     initializeParallax();
-    
+
     // Add button ripple effects
     initializeRippleEffects();
-    
+
     console.log('Animations initialized successfully');
 }
 
@@ -858,7 +858,7 @@ function initializeScrollAnimations() {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
     };
-    
+
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -868,7 +868,7 @@ function initializeScrollAnimations() {
             }
         });
     }, observerOptions);
-    
+
     // Observe elements that should animate on scroll
     const animateElements = document.querySelectorAll('.product-card, .feature-card, .sell-card');
     animateElements.forEach(el => {
@@ -882,7 +882,7 @@ function initializeSmoothScroll() {
         anchor.addEventListener('click', function (e) {
             const href = this.getAttribute('href');
             if (href === '#') return;
-            
+
             e.preventDefault();
             const target = document.querySelector(href);
             if (target) {
@@ -898,18 +898,18 @@ function initializeSmoothScroll() {
 // Parallax scrolling effect for background
 function initializeParallax() {
     let ticking = false;
-    
+
     window.addEventListener('scroll', () => {
         if (!ticking) {
             window.requestAnimationFrame(() => {
                 const scrolled = window.pageYOffset;
                 const parallaxElements = document.querySelectorAll('.hero-content');
-                
+
                 parallaxElements.forEach(el => {
                     const speed = 0.5;
-                    el.style.transform = 	ranslateY(px);
+                    el.style.transform = `translateY(${scrolled * speed}px)`;
                 });
-                
+
                 ticking = false;
             });
             ticking = true;
@@ -920,22 +920,22 @@ function initializeParallax() {
 // Ripple effect for buttons
 function initializeRippleEffects() {
     const buttons = document.querySelectorAll('.btn');
-    
+
     buttons.forEach(button => {
-        button.addEventListener('click', function(e) {
+        button.addEventListener('click', function (e) {
             const ripple = document.createElement('span');
             const rect = this.getBoundingClientRect();
             const size = Math.max(rect.width, rect.height);
             const x = e.clientX - rect.left - size / 2;
             const y = e.clientY - rect.top - size / 2;
-            
+
             ripple.style.width = ripple.style.height = size + 'px';
             ripple.style.left = x + 'px';
             ripple.style.top = y + 'px';
             ripple.classList.add('ripple-effect');
-            
+
             this.appendChild(ripple);
-            
+
             setTimeout(() => {
                 ripple.remove();
             }, 600);
@@ -945,7 +945,7 @@ function initializeRippleEffects() {
 
 // Add CSS for ripple effect dynamically
 const rippleStyle = document.createElement('style');
-rippleStyle.textContent = 
+rippleStyle.textContent = `
     .ripple-effect {
         position: absolute;
         border-radius: 50%;
@@ -976,7 +976,7 @@ rippleStyle.textContent =
             transform: translateY(0);
         }
     }
-;
+`;
 document.head.appendChild(rippleStyle);
 
 // Call initializeAnimations when DOM is ready
