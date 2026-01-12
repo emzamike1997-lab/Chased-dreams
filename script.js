@@ -828,3 +828,160 @@ function initializeProductCategories() {
         });
     });
 }
+
+// ===================================
+// DYNAMIC ANIMATIONS & INTERACTIONS
+// ===================================
+
+// Initialize animations on page load
+function initializeAnimations() {
+    console.log('Initializing dynamic animations...');
+    
+    // Add scroll-triggered animations
+    initializeScrollAnimations();
+    
+    // Add smooth scroll behavior
+    initializeSmoothScroll();
+    
+    // Add parallax effect to background
+    initializeParallax();
+    
+    // Add button ripple effects
+    initializeRippleEffects();
+    
+    console.log('Animations initialized successfully');
+}
+
+// Scroll-triggered animations using Intersection Observer
+function initializeScrollAnimations() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-in');
+                // Optionally unobserve after animation
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+    
+    // Observe elements that should animate on scroll
+    const animateElements = document.querySelectorAll('.product-card, .feature-card, .sell-card');
+    animateElements.forEach(el => {
+        observer.observe(el);
+    });
+}
+
+// Smooth scroll for navigation links
+function initializeSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (href === '#') return;
+            
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+}
+
+// Parallax scrolling effect for background
+function initializeParallax() {
+    let ticking = false;
+    
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                const scrolled = window.pageYOffset;
+                const parallaxElements = document.querySelectorAll('.hero-content');
+                
+                parallaxElements.forEach(el => {
+                    const speed = 0.5;
+                    el.style.transform = 	ranslateY(px);
+                });
+                
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+}
+
+// Ripple effect for buttons
+function initializeRippleEffects() {
+    const buttons = document.querySelectorAll('.btn');
+    
+    buttons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.classList.add('ripple-effect');
+            
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+}
+
+// Add CSS for ripple effect dynamically
+const rippleStyle = document.createElement('style');
+rippleStyle.textContent = 
+    .ripple-effect {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.6);
+        transform: scale(0);
+        animation: ripple-animation 0.6s ease-out;
+        pointer-events: none;
+    }
+    
+    @keyframes ripple-animation {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+    
+    .animate-in {
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+;
+document.head.appendChild(rippleStyle);
+
+// Call initializeAnimations when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAnimations);
+} else {
+    initializeAnimations();
+}
