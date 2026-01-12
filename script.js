@@ -300,24 +300,52 @@ function removeFromCart(index) {
 // ===================================
 
 
-// Initialize Supabase Client
-const supabaseUrl = 'https://keznpnwibyphyvjbslox.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtlem5wbndpYnlwaHl2amJzbG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxODE0MzIsImV4cCI6MjA4Mzc1NzQyMn0.efisBO6y3ySFV9InD2boDIIWpBnFVpKfsMBGH7K9OTM';
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+// Initialize Supabase Client (Lazy Load)
+let supabase;
 
 function initializeAuth() {
-    // Listen for auth state changes
-    supabase.auth.onAuthStateChange((event, session) => {
-        updateAuthUI(session);
-    });
+    console.log('Initializing Auth...');
 
-    // Check initial session
-    checkSession();
+    // Check if Supabase SDK is loaded
+    if (!window.supabase) {
+        console.error('CRITICAL ERROR: Supabase SDK not loaded. Check your internet connection or ad blocker.');
+        alert('Authentication system failed to load. Please refresh the page.');
+        return;
+    }
+
+    try {
+        const supabaseUrl = 'https://keznpnwibyphyvjbslox.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtlem5wbndpYnlwaHl2amJzbG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxODE0MzIsImV4cCI6MjA4Mzc1NzQyMn0.efisBO6y3ySFV9InD2boDIIWpBnFVpKfsMBGH7K9OTM';
+
+        // Initialize client only if not already done
+        if (!supabase) {
+            supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+            console.log('Supabase Client Connected');
+        }
+
+        // Listen for auth state changes
+        supabase.auth.onAuthStateChange((event, session) => {
+            console.log('Auth State Change:', event, session);
+            updateAuthUI(session);
+        });
+
+        // Check initial session
+        checkSession();
+
+    } catch (err) {
+        console.error('Auth Initialization Failed:', err);
+    }
 }
 
 async function checkSession() {
-    const { data: { session } } = await supabase.auth.getSession();
-    updateAuthUI(session);
+    if (!supabase) return;
+    try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        updateAuthUI(session);
+    } catch (e) {
+        console.error('Error checking session:', e);
+    }
 }
 
 function updateAuthUI(session) {
