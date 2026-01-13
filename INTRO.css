@@ -2531,54 +2531,6 @@ p {
    DYNAMIC STARTUP ANIMATIONS
    =================================== */
 
-/* Initial States - Prevents Flash of Unstyled Content */
-.sidebar,
-.main-content,
-.header,
-.site-header,
-.hero-content,
-.hero-title,
-.hero-subtitle,
-.hero-description,
-.hero-actions,
-.product-card,
-.feature-card,
-.category-tab,
-.sell-card,
-.nav-item,
-.pop-button {
-    opacity: 0;
-}
-
-/* Specific Transform Initial States */
-.sidebar,
-.nav-item {
-    transform: translateX(-100px);
-}
-
-.header,
-.site-header {
-    transform: translateY(-50px);
-}
-
-.hero-title,
-.hero-subtitle,
-.hero-description,
-.hero-actions,
-.feature-card,
-.category-tab {
-    transform: translateY(50px);
-}
-
-.product-card,
-.sell-card {
-    transform: scale(0.8);
-}
-
-.pop-button {
-    transform: scale(0);
-}
-
 /* Core Keyframe Animations */
 @keyframes fadeIn {
     from {
@@ -2686,48 +2638,40 @@ p {
 
 /* Apply Entrance Animations */
 .sidebar {
-    animation: slideInLeft 0.6s ease-out forwards;
+    animation: slideInLeft 0.6s ease-out;
 }
 
 .main-content {
-    animation: fadeIn 0.8s ease-out forwards;
+    animation: fadeIn 0.8s ease-out;
 }
 
 .header {
-    animation: slideInDown 0.5s ease-out forwards;
-}
-
-.site-header {
-    animation: slideInDown 0.5s ease-out forwards;
-}
-
-.pop-button {
-    animation: scaleIn 0.5s ease-out 0.7s forwards;
+    animation: slideInDown 0.5s ease-out;
 }
 
 .hero-content {
-    animation: fadeIn 1s ease-out forwards, slideInUp 0.8s ease-out forwards;
+    animation: fadeIn 1s ease-out, slideInUp 0.8s ease-out;
 }
 
 .hero-title {
-    animation: slideInUp 0.8s ease-out 0.2s forwards;
+    animation: slideInUp 0.8s ease-out 0.2s backwards;
 }
 
 .hero-subtitle {
-    animation: slideInUp 0.8s ease-out 0.4s forwards;
+    animation: slideInUp 0.8s ease-out 0.4s backwards;
 }
 
 .hero-description {
-    animation: slideInUp 0.8s ease-out 0.6s forwards;
+    animation: slideInUp 0.8s ease-out 0.6s backwards;
 }
 
 .hero-actions {
-    animation: slideInUp 0.8s ease-out 0.8s forwards;
+    animation: slideInUp 0.8s ease-out 0.8s backwards;
 }
 
 /* Product Cards Staggered Animation */
 .product-card {
-    animation: scaleIn 0.5s ease-out forwards;
+    animation: scaleIn 0.5s ease-out backwards;
 }
 
 .product-card:nth-child(1) {
@@ -2764,7 +2708,7 @@ p {
 
 /* Feature Cards Animation */
 .feature-card {
-    animation: slideInUp 0.6s ease-out forwards;
+    animation: slideInUp 0.6s ease-out backwards;
 }
 
 .feature-card:nth-child(1) {
@@ -2785,7 +2729,7 @@ p {
 
 /* Category Tabs Animation */
 .category-tab {
-    animation: slideInUp 0.5s ease-out forwards;
+    animation: slideInUp 0.5s ease-out backwards;
     position: relative;
     overflow: hidden;
 }
@@ -2888,7 +2832,7 @@ p {
 
 /* Sell Card Animation */
 .sell-card {
-    animation: scaleIn 0.5s ease-out forwards;
+    animation: scaleIn 0.5s ease-out backwards;
 }
 
 .sell-card:nth-child(1) {
@@ -2945,7 +2889,7 @@ p {
 
 /* Nav Items Stagger */
 .nav-item {
-    animation: slideInLeft 0.5s ease-out forwards;
+    animation: slideInLeft 0.5s ease-out backwards;
 }
 
 .nav-item:nth-child(1) {
